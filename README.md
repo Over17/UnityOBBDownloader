@@ -15,7 +15,7 @@ This plugin is published as an Android Library project, and is compatible with U
 1.	Open Unity, create a new project.
 2.	Add this package
 3.	Attach the DownloadObbExample.cs to the Main Camera
-4.	Open GooglePlayDownloader.cs and replace the BASE64_PUBLIC_KEY.
+4.	Open GooglePlayDownloader.cs and replace the PUBLIC_KEY with your value
 5.	Change the Bundle Identifier / Version Code so it matches an application already available on Google Play (that has .obb files attached).
 6.	Build and Run on your android device.
 
