@@ -5,6 +5,9 @@ using System;
 
 public class GooglePlayDownloader
 {
+#if UNITY_ANDROID && !UNITY_EDITOR
+	private static string PUBLIC_KEY = "REPLACE THIS WITH YOUR PUBLIC KEY";
+
 	private static AndroidJavaClass detectAndroidJNI;
 	public static bool RunningOnAndroid()
 	{
@@ -26,7 +29,7 @@ public class GooglePlayDownloader
 		using (AndroidJavaClass dl_service = new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderService"))
 		{
 	    // stuff for LVL -- MODIFY FOR YOUR APPLICATION!
-			dl_service.SetStatic("BASE64_PUBLIC_KEY", "REPLACE THIS WITH YOUR PUBLIC KEY");
+			dl_service.SetStatic("BASE64_PUBLIC_KEY", PUBLIC_KEY);
 	    // used by the preference obfuscater
 			dl_service.SetStatic("SALT", new byte[]{1, 43, 256-12, 256-1, 54, 98, 256-100, 256-12, 43, 2, 256-8, 256-4, 9, 5, 256-106, 256-108, 256-33, 45, 256-1, 84});
 		}
@@ -110,4 +113,5 @@ public class GooglePlayDownloader
 			obb_version = package_info.Get<int>("versionCode");
 		}
 	}
+#endif
 }
