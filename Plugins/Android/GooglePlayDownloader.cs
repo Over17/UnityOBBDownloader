@@ -6,7 +6,7 @@ using System;
 public class GooglePlayDownloader
 {
 #if UNITY_ANDROID && !UNITY_EDITOR
-	private static string PUBLIC_KEY = "REPLACE THIS WITH YOUR PUBLIC KEY";
+	private static string PublicKey = "REPLACE THIS WITH YOUR PUBLIC KEY";
 	private static AndroidJavaClass AndroidOSBuildClass = new AndroidJavaClass("android.os.Build");
 	private static AndroidJavaClass EnvironmentClass = new AndroidJavaClass("android.os.Environment");
 	private const string Environment_MediaMounted = "mounted";
