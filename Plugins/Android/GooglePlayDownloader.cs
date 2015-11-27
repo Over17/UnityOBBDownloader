@@ -11,6 +11,11 @@ public class GooglePlayDownloader
 	private static AndroidJavaClass EnvironmentClass = new AndroidJavaClass("android.os.Environment");
 	private const string Environment_MediaMounted = "mounted";
 
+	public static void SetPublicKey(string newKey)
+	{
+		PublicKey = newKey;
+	}
+
 	public static bool RunningOnAndroid()
 	{
 		return AndroidOSBuildClass.GetRawClass() != IntPtr.Zero;
