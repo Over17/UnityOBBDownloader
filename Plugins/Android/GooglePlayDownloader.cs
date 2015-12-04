@@ -52,22 +52,22 @@ public class GooglePlayDownloader
 
 	public static string GetMainOBBPath(string expansionFilePath)
 	{
-		if (expansionFilePath == null)
-			return null;
-		
-		PopulateOBBData();
-		string main = String.Format("{0}/main.{1}.{2}.obb", expansionFilePath, ObbVersion, ObbPackage);
-		return File.Exists(main) ? main : null;
+		return GetOBBPackagePath(expansionFilePath, "main");
 	}
 
 	public static string GetPatchOBBPath(string expansionFilePath)
 	{
+		return GetOBBPackagePath(expansionFilePath, "patch");
+	}
+
+	private static string GetOBBPackagePath(string expansionFilePath, string prefix)
+	{
 		if (expansionFilePath == null)
 			return null;
-		
+
 		PopulateOBBData();
-		string main = String.Format("{0}/patch.{1}.{2}.obb", expansionFilePath, ObbVersion, ObbPackage);
-		return File.Exists(main) ? main : null;
+		string filePath = String.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
+		return File.Exists(filePath) ? filePath : null;
 	}
 
 	public static void FetchOBB()
