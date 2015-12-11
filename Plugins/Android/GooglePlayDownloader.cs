@@ -83,13 +83,13 @@ public class GooglePlayDownloader
 			intent.Call<AndroidJavaObject>("addFlags", Intent_FLAG_ACTIVITY_NO_ANIMATION);
 			intent.Call<AndroidJavaObject>("putExtra", "unityplayer.Activity",
 														currentActivity.Call<AndroidJavaObject>("getClass").Call<string>("getName"));
-			currentActivity.Call("startActivity", intent);
-	
-			if (AndroidJNI.ExceptionOccurred() != System.IntPtr.Zero)
+			try
 			{
-				Debug.LogError("Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?");
-				AndroidJNI.ExceptionDescribe();
-				AndroidJNI.ExceptionClear();
+				currentActivity.Call("startActivity", intent);
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?\n" + e.Message);
 			}
 		}
 	}
