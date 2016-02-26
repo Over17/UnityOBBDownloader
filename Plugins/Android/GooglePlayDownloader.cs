@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using System;
 
-public class GooglePlayDownloader
+public static class GooglePlayDownloader
 {
 #if UNITY_ANDROID && !UNITY_EDITOR
 	private static string PublicKey = "REPLACE THIS WITH YOUR PUBLIC KEY";
