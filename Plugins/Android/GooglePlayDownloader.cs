@@ -36,11 +36,10 @@ public static class GooglePlayDownloader
 	
 	public static string GetExpansionFilePath()
 	{
-		PopulateOBBData();
-
 		if (EnvironmentClass.CallStatic<string>("getExternalStorageState") != Environment_MediaMounted)
 			return null;
 			
+		PopulateOBBData();
 		const string obbPath = "Android/obb";
 
 		using (AndroidJavaObject externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
