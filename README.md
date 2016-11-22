@@ -35,7 +35,13 @@ To rebuild the code
 
 	$> ant build
 
-	
+
+License
+-------
+Licensed under the Apache License, Version 2.0 (the "License").
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
 See also
 -------- 
 For more information on using .obb files in Unity, please refer to http://docs.unity3d.com/Manual/android-OBBsupport.html and http://developer.android.com/guide/market/expansion-files.html
