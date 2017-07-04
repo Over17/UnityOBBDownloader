@@ -3,7 +3,7 @@ UnityOBBDownloader
 
 This package is an adaption of the Google Play market_downloader library, for use with Unity Android (as a plugin).
 
-This plugin does NOT solve splitting up a >50MB .apk into .obb (through asset bundles or similar techiniques).
+This plugin does NOT solve splitting up a >100MB .apk into .obb (through asset bundles or similar techiniques).
 It merely handles the downloading of .obb files attached to a published .apk, on devices that don't support automatic downloading.
 
 This software is free and published as is, with no warranty and responsibilities - use it at your own risk.
