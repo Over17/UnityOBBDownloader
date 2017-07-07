@@ -94,6 +94,13 @@ class LicenseValidator {
                 responseCode == LICENSED_OLD_KEY) {
             // Verify signature.
             try {
+                if (TextUtils.isEmpty(signedData)) {
+                    Log.e(TAG, "Signature verification failed: signedData is empty. " +
+                            "(Device not signed-in to any Google accounts?)");
+                    handleInvalidResponse();
+                    return;
+                }
+
                 Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
                 sig.initVerify(publicKey);
                 sig.update(signedData.getBytes());
@@ -113,10 +120,6 @@ class LicenseValidator {
                 throw new RuntimeException(e);
             } catch (Base64DecoderException e) {
                 Log.e(TAG, "Could not Base64-decode signature.");
-                handleInvalidResponse();
-                return;
-            } catch (NullPointerException e) {
-                // This most likely means the user is not signed in to Google Play..
                 handleInvalidResponse();
                 return;
             }
