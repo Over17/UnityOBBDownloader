@@ -16,13 +16,15 @@
 
 package com.google.android.vending.expansion.downloader;
 
-//import com.android.vending.expansion.downloader.R;
-
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.os.SystemClock;
 import android.util.Log;
+
+//import com.android.vending.expansion.downloader.R;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -48,10 +50,10 @@ public class Helpers {
     }
 
     /*
-     * Parse the Content-Disposition HTTP Header. The format of the header is
-     * defined here: http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html This
-     * header provides a filename for content that is going to be downloaded to
-     * the file system. We only support the attachment type.
+     * Parse the Content-Disposition HTTP Header. The format of the header is defined here:
+     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html This header provides a filename for
+     * content that is going to be downloaded to the file system. We only support the attachment
+     * type.
      */
     static String parseContentDisposition(String contentDisposition) {
         try {
@@ -86,7 +88,7 @@ public class Helpers {
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
             // No SD card found.
-            if ( Constants.LOGVV ) {
+            if (Constants.LOGVV) {
                 Log.d(Constants.TAG, "no external storage");
             }
             return false;
@@ -95,8 +97,7 @@ public class Helpers {
     }
 
     /**
-     * @return the number of bytes available on the filesystem rooted at the
-     *         given File
+     * @return the number of bytes available on the filesystem rooted at the given File
      */
     public static long getAvailableBytes(File root) {
         StatFs stat = new StatFs(root.getPath());
@@ -129,10 +130,10 @@ public class Helpers {
     }
 
     /**
-     * Showing progress in MB here. It would be nice to choose the unit (KB, MB,
-     * GB) based on total file size, but given what we know about the expected
-     * ranges of file sizes for APK expansion files, it's probably not necessary.
-     * 
+     * Showing progress in MB here. It would be nice to choose the unit (KB, MB, GB) based on total
+     * file size, but given what we know about the expected ranges of file sizes for APK expansion
+     * files, it's probably not necessary.
+     *
      * @param overallProgress
      * @param overallTotal
      * @return
@@ -140,7 +141,7 @@ public class Helpers {
 
     static public String getDownloadProgressString(long overallProgress, long overallTotal) {
         if (overallTotal == 0) {
-            if ( Constants.LOGVV ) {
+            if (Constants.LOGVV) {
                 Log.e(Constants.TAG, "Notification called when total is zero");
             }
             return "";
@@ -149,12 +150,13 @@ public class Helpers {
                 (float) overallProgress / (1024.0f * 1024.0f))
                 + "MB /" +
                 String.format("%.2f", (float) overallTotal /
-                        (1024.0f * 1024.0f)) + "MB";
+                        (1024.0f * 1024.0f))
+                + "MB";
     }
 
     /**
      * Adds a percentile to getDownloadProgressString.
-     * 
+     *
      * @param overallProgress
      * @param overallTotal
      * @return
@@ -162,7 +164,7 @@ public class Helpers {
     static public String getDownloadProgressStringNotification(long overallProgress,
             long overallTotal) {
         if (overallTotal == 0) {
-            if ( Constants.LOGVV ) {
+            if (Constants.LOGVV) {
                 Log.e(Constants.TAG, "Notification called when total is zero");
             }
             return "";
@@ -173,7 +175,7 @@ public class Helpers {
 
     public static String getDownloadProgressPercent(long overallProgress, long overallTotal) {
         if (overallTotal == 0) {
-            if ( Constants.LOGVV ) {
+            if (Constants.LOGVV) {
                 Log.e(Constants.TAG, "Notification called when total is zero");
             }
             return "";
@@ -196,9 +198,8 @@ public class Helpers {
     }
 
     /**
-     * Returns the file name (without full path) for an Expansion APK file from
-     * the given context.
-     * 
+     * Returns the file name (without full path) for an Expansion APK file from the given context.
+     *
      * @param c the context
      * @param mainFile true for main file, false for patch file
      * @param versionCode the version of the file
@@ -209,8 +210,7 @@ public class Helpers {
     }
 
     /**
-     * Returns the filename (where the file should be saved) from info about a
-     * download
+     * Returns the filename (where the file should be saved) from info about a download
      */
     static public String generateSaveFileName(Context c, String fileName) {
         String path = getSaveFilePath(c)
@@ -218,26 +218,32 @@ public class Helpers {
         return path;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     static public String getSaveFilePath(Context c) {
-        File root = Environment.getExternalStorageDirectory();
-        String path = root.toString() + Constants.EXP_PATH + c.getPackageName();
-        return path;
+        // This technically existed since Honeycomb, but it is critical
+        // on KitKat and greater versions since it will create the
+        // directory if needed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return c.getObbDir().toString();
+        } else {
+            File root = Environment.getExternalStorageDirectory();
+            String path = root.toString() + Constants.EXP_PATH + c.getPackageName();
+            return path;
+        }
     }
 
     /**
-     * Helper function to ascertain the existence of a file and return
-     * true/false appropriately
-     * 
+     * Helper function to ascertain the existence of a file and return true/false appropriately
+     *
      * @param c the app/activity/service context
      * @param fileName the name (sans path) of the file to query
      * @param fileSize the size that the file must match
-     * @param deleteFileOnMismatch if the file sizes do not match, delete the
-     *            file
+     * @param deleteFileOnMismatch if the file sizes do not match, delete the file
      * @return true if it does exist, false otherwise
      */
     static public boolean doesFileExist(Context c, String fileName, long fileSize,
             boolean deleteFileOnMismatch) {
-        // the file may have been delivered by Market --- let's make sure
+        // the file may have been delivered by Play --- let's make sure
         // it's the size we expect
         File fileForNewFile = new File(Helpers.generateSaveFileName(c, fileName));
         if (fileForNewFile.exists()) {
@@ -253,10 +259,58 @@ public class Helpers {
         return false;
     }
 
+    public static final int FS_READABLE = 0;
+    public static final int FS_DOES_NOT_EXIST = 1;
+    public static final int FS_CANNOT_READ = 2;
+
     /**
-     * Converts download states that are returned by the {@link 
-     * IDownloaderClient#onDownloadStateChanged} callback into usable strings.
-     * This is useful if using the state strings built into the library to display user messages.
+     * Helper function to ascertain whether a file can be read.
+     *
+     * @param c the app/activity/service context
+     * @param fileName the name (sans path) of the file to query
+     * @return true if it does exist, false otherwise
+     */
+    static public int getFileStatus(Context c, String fileName) {
+        // the file may have been delivered by Play --- let's make sure
+        // it's the size we expect
+        File fileForNewFile = new File(Helpers.generateSaveFileName(c, fileName));
+        int returnValue;
+        if (fileForNewFile.exists()) {
+            if (fileForNewFile.canRead()) {
+                returnValue = FS_READABLE;
+            } else {
+                returnValue = FS_CANNOT_READ;
+            }
+        } else {
+            returnValue = FS_DOES_NOT_EXIST;
+        }
+        return returnValue;
+    }
+
+    /**
+     * Helper function to ascertain whether the application has the correct access to the OBB
+     * directory to allow an OBB file to be written.
+     * 
+     * @param c the app/activity/service context
+     * @return true if the application can write an OBB file, false otherwise
+     */
+    static public boolean canWriteOBBFile(Context c) {
+        String path = getSaveFilePath(c);
+        File fileForNewFile = new File(path);
+        boolean canWrite;
+        if (fileForNewFile.exists()) {
+            canWrite = fileForNewFile.isDirectory() && fileForNewFile.canWrite();
+        } else {
+            canWrite = fileForNewFile.mkdirs();
+        }
+        return canWrite;
+    }
+
+    /**
+     * Converts download states that are returned by the
+     * {@link IDownloaderClient#onDownloadStateChanged} callback into usable strings. This is useful
+     * if using the state strings built into the library to display user messages.
+     * 
      * @param state One of the STATE_* constants from {@link IDownloaderClient}.
      * @return string resource ID for the corresponding string.
      */
