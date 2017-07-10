@@ -55,12 +55,8 @@ public class DownloadNotification implements IDownloaderClient {
     private DownloadProgressInfo mProgressInfo;
     private PendingIntent mContentIntent;
 
-    static final String LOGTAG = "DownloadNotification";
-    static final int NOTIFICATION_ID = LOGTAG.hashCode();
-
-    public PendingIntent getClientIntent() {
-        return mContentIntent;
-    }
+    private static final String LOGTAG = "DownloadNotification";
+    private static final int NOTIFICATION_ID = LOGTAG.hashCode();
 
     public void setClientIntent(PendingIntent clientIntent) {
         this.mBuilder.setContentIntent(clientIntent);
@@ -169,8 +165,10 @@ public class DownloadNotification implements IDownloaderClient {
             .setContentText(mCurrentText);
             mCurrentBuilder = mBuilder;
         } else {
-            mActiveDownloadBuilder.setProgress((int) progress.mOverallTotal, (int) progress.mOverallProgress, false)
-            .setContentText(Helpers.getDownloadProgressString(progress.mOverallProgress, progress.mOverallTotal))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                mActiveDownloadBuilder.setProgress((int) progress.mOverallTotal, (int) progress.mOverallProgress, false);
+            }
+            mActiveDownloadBuilder.setContentText(Helpers.getDownloadProgressString(progress.mOverallProgress, progress.mOverallTotal))
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setTicker(mLabel + ": " + mCurrentText)
             .setContentTitle(mLabel)
@@ -219,11 +217,14 @@ public class DownloadNotification implements IDownloaderClient {
 
         // Set Notification category and priorities to something that makes sense for a long
         // lived background task.
-        mActiveDownloadBuilder.setPriority(Notification.PRIORITY_LOW);
-        mActiveDownloadBuilder.setCategory(Notification.CATEGORY_PROGRESS);
-
-        mBuilder.setPriority(Notification.PRIORITY_LOW);
-        mBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mActiveDownloadBuilder.setPriority(Notification.PRIORITY_LOW);
+            mBuilder.setPriority(Notification.PRIORITY_LOW);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mActiveDownloadBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+            mBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+        }
 
         mCurrentBuilder = mBuilder;
     }
