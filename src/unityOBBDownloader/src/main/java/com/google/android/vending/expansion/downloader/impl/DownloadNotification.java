@@ -16,7 +16,6 @@
 
 package com.google.android.vending.expansion.downloader.impl;
 
-//import com.android.vending.expansion.downloader.R;
 import com.google.android.vending.expansion.downloader.DownloadProgressInfo;
 import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
 import com.google.android.vending.expansion.downloader.Helpers;
@@ -26,6 +25,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.os.Build;
 import android.os.Messenger;
 
 /**
@@ -44,16 +44,16 @@ public class DownloadNotification implements IDownloaderClient {
     private int mState;
     private final Context mContext;
     private final NotificationManager mNotificationManager;
-    private String mCurrentTitle;
+    private CharSequence mCurrentTitle;
 
     private IDownloaderClient mClientProxy;
-    final ICustomNotification mCustomNotification;
-    private Notification mNotification;
-    private Notification mCurrentNotification;
+    private Notification.Builder mActiveDownloadBuilder;
+    private Notification.Builder mBuilder;
+    private Notification.Builder mCurrentBuilder;
     private CharSequence mLabel;
     private String mCurrentText;
-    private PendingIntent mContentIntent;
     private DownloadProgressInfo mProgressInfo;
+    private PendingIntent mContentIntent;
 
     static final String LOGTAG = "DownloadNotification";
     static final int NOTIFICATION_ID = LOGTAG.hashCode();
@@ -62,8 +62,10 @@ public class DownloadNotification implements IDownloaderClient {
         return mContentIntent;
     }
 
-    public void setClientIntent(PendingIntent mClientIntent) {
-        this.mContentIntent = mClientIntent;
+    public void setClientIntent(PendingIntent clientIntent) {
+        this.mBuilder.setContentIntent(clientIntent);
+        this.mActiveDownloadBuilder.setContentIntent(clientIntent);
+        this.mContentIntent = clientIntent;
     }
 
     public void resendState() {
@@ -130,19 +132,26 @@ public class DownloadNotification implements IDownloaderClient {
                     ongoingEvent = true;
                     break;
             }
+
             mCurrentText = mContext.getString(stringDownloadID);
-            mCurrentTitle = mLabel.toString();
-            mCurrentNotification.tickerText = mLabel + ": " + mCurrentText;
-            mCurrentNotification.icon = iconResource;
-            mCurrentNotification.setLatestEventInfo(mContext, mCurrentTitle, mCurrentText,
-                    mContentIntent);
+            mCurrentTitle = mLabel;
+            mCurrentBuilder.setTicker(mLabel + ": " + mCurrentText)
+            .setSmallIcon(iconResource)
+            .setContentTitle(mCurrentTitle)
+            .setContentText(mCurrentText);
             if (ongoingEvent) {
-                mCurrentNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+                mCurrentBuilder.setOngoing(true);
             } else {
-                mCurrentNotification.flags &= ~Notification.FLAG_ONGOING_EVENT;
-                mCurrentNotification.flags |= Notification.FLAG_AUTO_CANCEL;
+                mCurrentBuilder.setOngoing(false);
+                mCurrentBuilder.setAutoCancel(true);
             }
-            mNotificationManager.notify(NOTIFICATION_ID, mCurrentNotification);
+            Notification notification;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                notification = mCurrentBuilder.build();
+            } else {
+                notification = mCurrentBuilder.getNotification();
+            }
+            mNotificationManager.notify(NOTIFICATION_ID, notification);
         }
     }
 
@@ -154,45 +163,34 @@ public class DownloadNotification implements IDownloaderClient {
         }
         if (progress.mOverallTotal <= 0) {
             // we just show the text
-            mNotification.tickerText = mCurrentTitle;
-            mNotification.icon = android.R.drawable.stat_sys_download;
-            mNotification.setLatestEventInfo(mContext, mLabel, mCurrentText, mContentIntent);
-            mCurrentNotification = mNotification;
+            mBuilder.setTicker(mCurrentTitle)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle(mCurrentTitle)
+            .setContentText(mCurrentText);
+            mCurrentBuilder = mBuilder;
         } else {
-            mCustomNotification.setCurrentBytes(progress.mOverallProgress);
-            mCustomNotification.setTotalBytes(progress.mOverallTotal);
-            mCustomNotification.setIcon(android.R.drawable.stat_sys_download);
-            mCustomNotification.setPendingIntent(mContentIntent);
-            mCustomNotification.setTicker(mLabel + ": " + mCurrentText);
-            mCustomNotification.setTitle(mLabel);
-            mCustomNotification.setTimeRemaining(progress.mTimeRemaining);
-            mCurrentNotification = mCustomNotification.updateNotification(mContext);
+            mActiveDownloadBuilder.setProgress((int) progress.mOverallTotal, (int) progress.mOverallProgress, false)
+            .setContentText(Helpers.getDownloadProgressString(progress.mOverallProgress, progress.mOverallTotal))
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setTicker(mLabel + ": " + mCurrentText)
+            .setContentTitle(mLabel)
+            .setContentInfo(mContext.getString(Helpers.getStringResource(mContext, "time_remaining_notification"),
+                    Helpers.getTimeRemaining(progress.mTimeRemaining)));
+            mCurrentBuilder = mActiveDownloadBuilder;
         }
-        mNotificationManager.notify(NOTIFICATION_ID, mCurrentNotification);
-    }
-
-    public interface ICustomNotification {
-        void setTitle(CharSequence title);
-
-        void setTicker(CharSequence ticker);
-
-        void setPendingIntent(PendingIntent mContentIntent);
-
-        void setTotalBytes(long totalBytes);
-
-        void setCurrentBytes(long currentBytes);
-
-        void setIcon(int iconResource);
-
-        void setTimeRemaining(long timeRemaining);
-
-        Notification updateNotification(Context c);
+        Notification notification;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            notification = mCurrentBuilder.build();
+        } else {
+            notification = mCurrentBuilder.getNotification();
+        }
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
     /**
      * Called in response to onClientUpdated. Creates a new proxy and notifies
      * it of the current state.
-     * 
+     *
      * @param msg the client Messenger to notify
      */
     public void setMessenger(Messenger msg) {
@@ -207,7 +205,7 @@ public class DownloadNotification implements IDownloaderClient {
 
     /**
      * Constructor
-     * 
+     *
      * @param ctx The context to use to obtain access to the Notification
      *            Service
      */
@@ -215,13 +213,19 @@ public class DownloadNotification implements IDownloaderClient {
         mState = -1;
         mContext = ctx;
         mLabel = applicationLabel;
-        mNotificationManager = (NotificationManager)
-                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mCustomNotification = CustomNotificationFactory
-                .createCustomNotification();
-        mNotification = new Notification();
-        mCurrentNotification = mNotification;
+        mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mActiveDownloadBuilder = new Notification.Builder(ctx);
+        mBuilder = new Notification.Builder(ctx);
 
+        // Set Notification category and priorities to something that makes sense for a long
+        // lived background task.
+        mActiveDownloadBuilder.setPriority(Notification.PRIORITY_LOW);
+        mActiveDownloadBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+
+        mBuilder.setPriority(Notification.PRIORITY_LOW);
+        mBuilder.setCategory(Notification.CATEGORY_PROGRESS);
+
+        mCurrentBuilder = mBuilder;
     }
 
     @Override

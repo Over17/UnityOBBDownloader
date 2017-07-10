@@ -9,7 +9,7 @@
         <service android:name="com.unity3d.plugin.downloader.UnityDownloaderService" />
         <receiver android:name="com.unity3d.plugin.downloader.UnityAlarmReceiver" />
     </application>
-    <uses-sdk android:minSdkVersion="9"/>
+    <uses-sdk android:minSdkVersion="11"/>
     <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
