@@ -22,4 +22,8 @@
         <item name="android:background">@android:color/background_dark</item>
     </style>
 
+    <style name="NotificationTextSecondary" parent="NotificationText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>
