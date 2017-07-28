@@ -5,7 +5,6 @@ using System;
 
 public static class GooglePlayDownloader
 {
-#if UNITY_ANDROID && !UNITY_EDITOR
 	private static string PublicKey = "REPLACE THIS WITH YOUR PUBLIC KEY";
 	private static AndroidJavaClass AndroidOSBuildClass = new AndroidJavaClass("android.os.Build");
 	private static AndroidJavaClass EnvironmentClass = new AndroidJavaClass("android.os.Environment");
@@ -109,5 +108,4 @@ public static class GooglePlayDownloader
 			ObbVersion = packageInfo.Get<int>("versionCode");
 		}
 	}
-#endif
 }
