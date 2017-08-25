@@ -1,2 +1,8 @@
-Plugins/Android/UnityOBBDownloader/local.properties
-Plugins/Android/UnityOBBDownloader/bin/classes/
+Library/
+Packages/
+ProjectSettings/
+Temp/
+*.meta
+*.csproj
+*.sln
+.vs/
