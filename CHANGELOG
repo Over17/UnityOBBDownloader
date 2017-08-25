@@ -1,0 +1,10 @@
+Version 2.0 (2017-08-25)
+
+* Updated the plugin to be an AAR
+* Solved Android M compatibility issues (however min API level is now 11)
+* Updated project structure and documentation
+
+
+Version 1.0
+
+* Initial version
