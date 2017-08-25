@@ -83,9 +83,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         if (EnvironmentClass.CallStatic<string>("getExternalStorageState") != Environment_MediaMounted)
             return null;
 
-        PopulateOBBData();
         const string obbPath = "Android/obb";
-
         using (var externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
         {
             var externalRoot = externalStorageDirectory.Call<string>("getPath");
@@ -108,25 +106,46 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         if (expansionFilePath == null)
             return null;
 
-        PopulateOBBData();
         string filePath = string.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
         return File.Exists(filePath) ? filePath : null;
     }
 
+    private static string m_ObbPackage;
+    private static string ObbPackage
+    {
+        get
+        {
+            if (m_ObbPackage == null)
+            {
+                PopulateOBBProperties();
+            }
+            return m_ObbPackage;
+        }
+    }
+
+    private static int m_ObbVersion;
+    private static int ObbVersion
+    {
+        get
+        {
+            if (m_ObbVersion == 0)
+            {
+                PopulateOBBProperties();
+            }
+            return m_ObbVersion;
+        }
+    }
+
     // This code will reuse the package version from the .apk when looking for the .obb
     // Modify as appropriate
-    private static string ObbPackage;
-    private static int ObbVersion = 0;
-    private static void PopulateOBBData()
+    private static void PopulateOBBProperties()
     {
-        if (ObbVersion != 0)
-            return;
-        using (AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        using (var unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
-            AndroidJavaObject currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-            ObbPackage = currentActivity.Call<string>("getPackageName");
-            AndroidJavaObject packageInfo = currentActivity.Call<AndroidJavaObject>("getPackageManager").Call<AndroidJavaObject>("getPackageInfo", ObbPackage, 0);
-            ObbVersion = packageInfo.Get<int>("versionCode");
+            var currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
+            m_ObbPackage = currentActivity.Call<string>("getPackageName");
+            var packageInfo = currentActivity.Call<AndroidJavaObject>("getPackageManager").Call<AndroidJavaObject>("getPackageInfo", ObbPackage, 0);
+            m_ObbVersion = packageInfo.Get<int>("versionCode");
         }
     }
 }
