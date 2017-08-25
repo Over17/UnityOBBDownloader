@@ -44,14 +44,24 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
 
     public string PublicKey { get; set; }
 
+    internal GooglePlayObbDownloader()
+    {
+        using (var downloaderServiceClass = new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderService"))
+        {
+            downloaderServiceClass.SetStatic("BASE64_PUBLIC_KEY", PublicKey);
+            // Used by the preference obfuscator
+            downloaderServiceClass.SetStatic("SALT", new byte[] { 1, 43, 256 - 12, 256 - 1, 54, 98, 256 - 100, 256 - 12, 43, 2, 256 - 8, 256 - 4, 9, 5, 256 - 106, 256 - 108, 256 - 33, 45, 256 - 1, 84 });
+        }
+    }
+
     public void FetchOBB()
     {
-        using (AndroidJavaClass unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        using (var unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
-            AndroidJavaObject currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
-            AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent",
-                                                            currentActivity,
-                                                            new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderActivity"));
+            var currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
+            var intent = new AndroidJavaObject("android.content.Intent",
+                                                currentActivity,
+                                                new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderActivity"));
 
             const int Intent_FLAG_ACTIVITY_NO_ANIMATION = 0x10000;
             intent.Call<AndroidJavaObject>("addFlags", Intent_FLAG_ACTIVITY_NO_ANIMATION);
@@ -61,20 +71,10 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
             {
                 currentActivity.Call("startActivity", intent);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.LogError("Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?\n" + e.Message);
+                Debug.LogError("Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?\n" + ex.Message);
             }
-        }
-    }
-
-    internal GooglePlayObbDownloader()
-    {
-        using (AndroidJavaClass downloaderServiceClass = new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderService"))
-        {
-            downloaderServiceClass.SetStatic("BASE64_PUBLIC_KEY", PublicKey);
-            // Used by the preference obfuscator
-            downloaderServiceClass.SetStatic("SALT", new byte[] { 1, 43, 256 - 12, 256 - 1, 54, 98, 256 - 100, 256 - 12, 43, 2, 256 - 8, 256 - 4, 9, 5, 256 - 106, 256 - 108, 256 - 33, 45, 256 - 1, 84 });
         }
     }
 
@@ -86,10 +86,10 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         PopulateOBBData();
         const string obbPath = "Android/obb";
 
-        using (AndroidJavaObject externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
+        using (var externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
         {
-            string root = externalStorageDirectory.Call<string>("getPath");
-            return String.Format("{0}/{1}/{2}", root, obbPath, ObbPackage);
+            var externalRoot = externalStorageDirectory.Call<string>("getPath");
+            return string.Format("{0}/{1}/{2}", externalRoot, obbPath, ObbPackage);
         }
     }
 
@@ -109,7 +109,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
             return null;
 
         PopulateOBBData();
-        string filePath = String.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
+        string filePath = string.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
         return File.Exists(filePath) ? filePath : null;
     }
 
