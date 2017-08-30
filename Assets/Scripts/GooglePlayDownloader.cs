@@ -7,8 +7,8 @@ public interface IGooglePlayObbDownloader
     string PublicKey { get; set; }
 
     string GetExpansionFilePath();
-    string GetMainOBBPath(string expansionFilePath);
-    string GetPatchOBBPath(string expansionFilePath);
+    string GetMainOBBPath();
+    string GetPatchOBBPath();
     void FetchOBB();
 }
 
@@ -91,14 +91,14 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         }
     }
 
-    public string GetMainOBBPath(string expansionFilePath)
+    public string GetMainOBBPath()
     {
-        return GetOBBPackagePath(expansionFilePath, "main");
+        return GetOBBPackagePath(GetExpansionFilePath(), "main");
     }
 
-    public string GetPatchOBBPath(string expansionFilePath)
+    public string GetPatchOBBPath()
     {
-        return GetOBBPackagePath(expansionFilePath, "patch");
+        return GetOBBPackagePath(GetExpansionFilePath(), "patch");
     }
 
     private static string GetOBBPackagePath(string expansionFilePath, string prefix)
