@@ -103,10 +103,10 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
 
     private static string GetOBBPackagePath(string expansionFilePath, string prefix)
     {
-        if (expansionFilePath == null)
+        if (string.IsNullOrEmpty(expansionFilePath))
             return null;
 
-        string filePath = string.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
+        var filePath = string.Format("{0}/{1}.{2}.{3}.obb", expansionFilePath, prefix, ObbVersion, ObbPackage);
         return File.Exists(filePath) ? filePath : null;
     }
 
@@ -144,7 +144,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         {
             var currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
             m_ObbPackage = currentActivity.Call<string>("getPackageName");
-            var packageInfo = currentActivity.Call<AndroidJavaObject>("getPackageManager").Call<AndroidJavaObject>("getPackageInfo", ObbPackage, 0);
+            var packageInfo = currentActivity.Call<AndroidJavaObject>("getPackageManager").Call<AndroidJavaObject>("getPackageInfo", m_ObbPackage, 0);
             m_ObbVersion = packageInfo.Get<int>("versionCode");
         }
     }
