@@ -33,8 +33,6 @@ public class GooglePlayObbDownloadManager
     {
         return m_AndroidOSBuildClass.GetRawClass() != IntPtr.Zero;
     }
-
-
 }
 
 internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
