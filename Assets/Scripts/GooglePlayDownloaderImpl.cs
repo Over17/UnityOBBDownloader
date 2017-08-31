@@ -9,7 +9,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
 
     public string PublicKey { get; set; }
 
-    internal GooglePlayObbDownloader()
+    private void ApplyPublicKey()
     {
         using (var downloaderServiceClass = new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderService"))
         {
@@ -21,6 +21,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
 
     public void FetchOBB()
     {
+        ApplyPublicKey();
         using (var unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
             var currentActivity = unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
