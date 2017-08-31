@@ -11,6 +11,10 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
 
     private void ApplyPublicKey()
     {
+        if (string.IsNullOrEmpty(PublicKey))
+        {
+            Debug.LogError("GooglePlayObbDownloader: The public key is not set - did you forget to set it in the script?\n");
+        }
         using (var downloaderServiceClass = new AndroidJavaClass("com.unity3d.plugin.downloader.UnityDownloaderService"))
         {
             downloaderServiceClass.SetStatic("BASE64_PUBLIC_KEY", PublicKey);
@@ -39,7 +43,7 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?\n" + ex.Message);
+                Debug.LogError("GooglePlayObbDownloader: Exception occurred while attempting to start DownloaderActivity - is the AndroidManifest.xml incorrect?\n" + ex.Message);
             }
         }
     }

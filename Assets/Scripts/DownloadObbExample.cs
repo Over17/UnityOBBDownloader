@@ -7,7 +7,7 @@ public class DownloadObbExample : MonoBehaviour
     void Start()
     {
         m_obbDownloader = GooglePlayObbDownloadManager.GetGooglePlayObbDownloader();
-        m_obbDownloader.PublicKey = "YOUR PUBLIC KEY HERE";
+        m_obbDownloader.PublicKey = ""; // YOUR PUBLIC KEY HERE
     }	
 
     void OnGUI()
