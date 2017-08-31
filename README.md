@@ -8,9 +8,10 @@ This software is free and published as is, with no warranty and responsibilities
 
 ## Usage
 This plugin is published as an AAR, and is compatible with Unity 5+. Minimum Android version supported is Honeycomb (API level 11). For a version compatible with Unity 4 or with older Android devices, please checkout changeset tagged `1.0`.
+The C# API of the plugin is available in `IGooglePlayObbDownloader` interface. Use `GooglePlayObbDownloadManager.GetGooglePlayObbDownloader()` to obtain an instance.
 
-0.	Add the plugin to your project. You need the AAR and the C# script (Assets/Plugins/Android/unityOBBDownloader.aar and Assets/Scripts/GooglePlayDownloader.cs)
-1.	Open GooglePlayDownloader.cs and replace the `PublicKey` with your value
+0.	Add the plugin to your project. You need the AAR and the C# scripts (`Assets/Plugins/Android/unityOBBDownloader.aar`, `Assets/Scripts/GooglePlayDownloader.cs` and `Assets/Scripts/GooglePlayDownloaderImpl.cs`)
+1.	In your script, don't forget to set `PublicKey` to your own value. You'll see a message logged and probably a crash if you skip this step
 2.	Change the Bundle Identifier / Version Code so it matches the application already available on Google Play (that has .obb files attached)
 3.	Build and Run on your Android device
 
