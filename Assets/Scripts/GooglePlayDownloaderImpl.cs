@@ -48,17 +48,25 @@ internal class GooglePlayObbDownloader : IGooglePlayObbDownloader
         }
     }
 
+    private string m_ExpansionFilePath;
     public string GetExpansionFilePath()
     {
         if (EnvironmentClass.CallStatic<string>("getExternalStorageState") != Environment_MediaMounted)
-            return null;
-
-        const string obbPath = "Android/obb";
-        using (var externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
         {
-            var externalRoot = externalStorageDirectory.Call<string>("getPath");
-            return string.Format("{0}/{1}/{2}", externalRoot, obbPath, ObbPackage);
+            m_ExpansionFilePath = null;
+            return m_ExpansionFilePath;
         }
+
+        if (string.IsNullOrEmpty(m_ExpansionFilePath))
+        {
+            const string obbPath = "Android/obb";
+            using (var externalStorageDirectory = EnvironmentClass.CallStatic<AndroidJavaObject>("getExternalStorageDirectory"))
+            {
+                var externalRoot = externalStorageDirectory.Call<string>("getPath");
+                m_ExpansionFilePath = string.Format("{0}/{1}/{2}", externalRoot, obbPath, ObbPackage);
+            }
+        }
+        return m_ExpansionFilePath;
     }
 
     public string GetMainOBBPath()
