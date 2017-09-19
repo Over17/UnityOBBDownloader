@@ -21,14 +21,14 @@ public class GooglePlayObbDownloadManager
         if (m_Instance != null)
             return m_Instance;
 
-        if (!IsRunningOnAndroid())
+        if (!IsDownloaderAvailable())
             return null;
 
         m_Instance = new GooglePlayObbDownloader();
         return m_Instance;
     }
 
-    public static bool IsRunningOnAndroid()
+    public static bool IsDownloaderAvailable()
     {
         return m_AndroidOSBuildClass.GetRawClass() != IntPtr.Zero;
     }

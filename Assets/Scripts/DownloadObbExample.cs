@@ -12,7 +12,7 @@ public class DownloadObbExample : MonoBehaviour
 
     void OnGUI()
     {
-        if (!GooglePlayObbDownloadManager.IsRunningOnAndroid())
+        if (!GooglePlayObbDownloadManager.IsDownloaderAvailable())
         {
             GUI.Label(new Rect(10, 10, Screen.width-10, 20), "Use GooglePlayDownloader only on Android device!");
             return;
