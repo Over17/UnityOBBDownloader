@@ -1,3 +1,9 @@
+Version 3.0 (2017-09-22)
+
+* Scripts rewritten, with IGooglePlayObbDownloader interface extracted
+* Sample updated to match the new API
+
+
 Version 2.0 (2017-08-25)
 
 * Updated the plugin to be an AAR
