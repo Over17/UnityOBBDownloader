@@ -1,7 +1,10 @@
 Library/
 Packages/
 ProjectSettings/
+src/unityOBBDownloader/.gradle/
+src/unityOBBDownloader/build/
 Temp/
+UnityPackageManager/
 *.meta
 *.csproj
 *.sln
