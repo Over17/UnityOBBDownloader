@@ -18,7 +18,7 @@ The C# API of the plugin is available in `IGooglePlayObbDownloader` interface. U
 For a script sample, please refer to `Assets/Scripts/DownloadObbExample.cs`.
 
 ## How to Build
-Use Android Studio to build the AAR from the source in src/ directory.
+Run `gradlew assemble` from src/UnityAndroidPermissions/
 
 ## License
 Copyright (C) 2016-2017 Yury Habets
